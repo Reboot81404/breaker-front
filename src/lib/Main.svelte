@@ -12,8 +12,11 @@
   //let logs = [];
   let loading = false;
   let speed = "medium";
+  let isAdvanced = false;
+  let customParams = {};
 
-  async function decode(selectedSpeed) {
+
+  async function decode(selectedSpeed, advancedMode, params,mode) {
     loading = true;
     //logs = [];
 
@@ -24,8 +27,12 @@
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ cipher: cipherText,
-          speed: selectedSpeed
+        body: JSON.stringify({ 
+          cipher: cipherText,
+          speed: selectedSpeed,
+          is_advanced: advancedMode,
+          custom_params: params,
+          mode: mode
          })
       });
 
@@ -46,7 +53,14 @@
 
 <main>
   <div class="card-container">
-    <InputCard bind:cipherText bind:speed onDecode={decode} {loading} />
+    <InputCard 
+  bind:cipherText 
+  bind:speed 
+  bind:isAdvanced 
+  bind:customParams 
+  onDecode={decode} 
+  {loading} 
+/>
 
     <DetailsCard {cipherType} {cipherKey} />
 
