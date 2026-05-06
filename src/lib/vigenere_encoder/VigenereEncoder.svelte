@@ -96,7 +96,7 @@
     resize: vertical;
   }
   button {
-    background: #4caf50;
+    background: #242424;
     color: white;
     padding: 10px 20px;
     border: none;

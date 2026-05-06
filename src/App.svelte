@@ -2,9 +2,11 @@
   import Router, { link } from 'svelte-spa-router'; 
   import MainSolver from './lib/Main.svelte';
   import VigenereEncoder from './lib/vigenere_encoder/VigenereEncoder.svelte';
+  import SubstitutionEncoder from './lib/substution_encoder/SubstitutionEncoder.svelte';
 
   const routes = {
     '/': MainSolver,
+    '/substitution_encoder': SubstitutionEncoder,
     '/vigenere_encoder': VigenereEncoder
   };
 
@@ -39,7 +41,7 @@
     {#if openMenu === 'encoder'}
       <div class="dropdown-content">
         <a href="/vigenere_encoder" use:link>Vigenere Encoder</a>
-        <a href="/substution_encoder" use:link>Substution Encoder</a>
+        <a href="/substitution_encoder" use:link>Substution Encoder</a>
       </div>
     {/if}
   </div>
