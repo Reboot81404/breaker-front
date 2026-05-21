@@ -17,6 +17,8 @@
   let sliderValue = levels.indexOf(speed);
 
   const modes = [
+    { id: 'affine', label: 'Affine' },
+    { id: 'playfair', label: 'Playfair' },
     { id: 'sub', label: 'Substitution' },
     { id: 'vig', label: 'Vigenere' },
     { id: 'both', label: 'Substitution & Vigenere' }
@@ -41,10 +43,13 @@
         {mode.label}
       </label>
     {/each}
-    <span 
-      class="glider" 
-      style="transform: translateX({modes.findIndex(m => m.id === selectedMode) * 100}%);"
-    ></span>
+<span 
+  class="glider" 
+  style="
+    width: calc(100% / {modes.length} - 10px);
+    left: calc({modes.findIndex(m => m.id === selectedMode)} * (100% / {modes.length}) + 5px);
+  "
+></span>
   </div>
 </div>
 
@@ -357,17 +362,14 @@
     color: #1a1a1a;
   }
 
-  .glider {
-    position: absolute;
-    display: flex;
-    height: 40px;
-    width: calc(100% / 3 - 10px); 
-    background-color: #e6eef9;
-    z-index: 1;
-    border-radius: 99px;
-    transition: 0.25s ease-out;
-    margin: 0 5px; 
-  }
+.glider {
+  position: absolute;
+  height: 40px;
+  background-color: #e6eef9;
+  z-index: 1;
+  border-radius: 99px;
+  transition: all 0.25s ease-out;
+}
 
   .btn-decode.loading {
     color: #e8e8e8; 
