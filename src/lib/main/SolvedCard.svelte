@@ -3,6 +3,6 @@
 </script>
 
 <div class="card">
-  <h3>Result</h3>
+  <strong>Result</strong>
   <textarea readonly bind:value={solvedText}></textarea>
 </div>

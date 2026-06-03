@@ -83,9 +83,9 @@
   <div class="speed-selector">
     <input type="range" min="0" max="2" step="1" bind:value={sliderValue} class="large-slider" />
     <div class="labels">
-      <span class:active={speed === 'fast'}>Hızlı</span>
-      <span class:active={speed === 'medium'}>Orta</span>
-      <span class:active={speed === 'deep'}>Derin</span>
+      <span class:active={speed === 'fast'}>Fast</span>
+      <span class:active={speed === 'medium'}>Medium</span>
+      <span class:active={speed === 'deep'}>Deep</span>
     </div>
   </div>
 
