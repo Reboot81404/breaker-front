@@ -77,7 +77,7 @@
     </label>
   </div>
 
-  <label for="cipher-input"><strong>Şifreli metni girin</strong></label>
+  <label for="cipher-input"><strong>Enter the cipher</strong></label>
   <textarea id="cipher-input" bind:value={cipherText} placeholder="Buraya yapıştırın..."></textarea>
 
   <div class="speed-selector">
@@ -95,7 +95,7 @@
     on:click={() => onDecode(speed, isAdvanced, customParams, selectedMode, ngramWeights)}
     disabled={!cipherText || loading}
   >
-    {loading ? 'Çözülüyor...' : 'Metni çöz'}
+    {loading ? 'Solving...' : 'Break cipher'}
   </button>
 </div>
 
