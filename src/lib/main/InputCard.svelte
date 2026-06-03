@@ -1,9 +1,15 @@
+
 <script>
   export let cipherText = "";
   export let speed = "medium";
   export let onDecode;
   export let loading = false;
   export let isAdvanced = false;
+  export let ngramWeights = {
+    bigram: 0,
+    trigram: 0,
+    quadgram: 1
+  };
 
   const CONFIG_DEFAULTS = {
     fast: { max_time: 1.5, stagnation_limit: 2, local_time: 0.4, k_candidates: 1, time_multiplier: 0.5, max_k: 10 },
@@ -15,6 +21,12 @@
 
   const levels = ["fast", "medium", "deep"];
   let sliderValue = levels.indexOf(speed);
+
+  const ngramModes = [
+    { id: "bigram", label: "Bigram" },
+    { id: "trigram", label: "Trigram" },
+    { id: "quadgram", label: "Quadgram" }
+  ];
 
   const modes = [
     { id: 'affine', label: 'Affine' },
@@ -29,6 +41,7 @@
     customParams = { ...CONFIG_DEFAULTS[speed] };
   }
 </script>
+
 <div class="mode-selector-container">
   <div class="tabs">
     {#each modes as mode, i}
@@ -43,13 +56,13 @@
         {mode.label}
       </label>
     {/each}
-<span 
-  class="glider" 
-  style="
-    width: calc(100% / {modes.length} - 10px);
-    left: calc({modes.findIndex(m => m.id === selectedMode)} * (100% / {modes.length}) + 5px);
-  "
-></span>
+    <span 
+      class="glider" 
+      style="
+        width: calc(100% / {modes.length} - 10px);
+        left: calc({modes.findIndex(m => m.id === selectedMode)} * (100% / {modes.length}) + 5px);
+      "
+    ></span>
   </div>
 </div>
 
@@ -76,12 +89,10 @@
     </div>
   </div>
 
-
-
   <button
     class="btn-decode"
     class:loading
-    on:click={() => onDecode(speed, isAdvanced, customParams, selectedMode)}
+    on:click={() => onDecode(speed, isAdvanced, customParams, selectedMode, ngramWeights)}
     disabled={!cipherText || loading}
   >
     {loading ? 'Çözülüyor...' : 'Metni çöz'}
@@ -90,23 +101,56 @@
 
 {#if isAdvanced}
   <div class="card expert-card">
-    <h3 class="expert-title">Gelişmiş Mod</h3>
+    <h3 class="expert-title">Expert Mode</h3>
+    
+    <div class="expert-section full-width" style="margin-bottom: 15px;">
+      <span class="section-tag">N gram Weights</span>
+      <div class="ngram-grid">
+        {#each Object.entries(ngramWeights) as [key, value]}
+          <div class="ngram-item">
+            <label class="checkbox-line">
+              <input
+                type="checkbox"
+                checked={value > 0}
+                on:change={(e) => {
+                  if (e.target.checked) {
+                    ngramWeights[key] = 1;
+                  } else {
+                    ngramWeights[key] = 0;
+                  }
+                  ngramWeights = { ...ngramWeights };
+                }}
+              />
+              <span>{key}</span>
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="0.1"
+              bind:value={ngramWeights[key]}
+              disabled={ngramWeights[key] === 0}
+              class="weight-input"
+            />
+          </div>
+        {/each}
+      </div>
+    </div>
+
     <div class="expert-grid">
-      
       {#if selectedMode === 'sub' || selectedMode === 'both'}
         <div class="expert-section">
           <span class="section-tag">Substitution</span>
           <div class="input-row">
             <div class="field">
-              <label for="max-time">Max Süre</label>
+              <label for="max-time">Max Time</label>
               <input id="max-time" type="number" step="0.1" bind:value={customParams.max_time} />
             </div>
             <div class="field">
-              <label for="stop-time">Durma Sınırı</label>
+              <label for="stop-time">Stagnation Limit</label>
               <input id="stop-time" type="number" step="1" bind:value={customParams.stagnation_limit} />
             </div>
             <div class="field">
-              <label for="sensivity">Hassasiyet</label>
+              <label for="sensivity">Sensitivity (local_time)</label>
               <input id="sensivity" type="number" step="0.1" bind:value={customParams.local_time} />
             </div>
           </div>
@@ -118,15 +162,15 @@
           <span class="section-tag">Vigenere</span>
           <div class="input-row">
             <div class="field">
-              <label for="k_candidate">Aday K</label>
+              <label for="k_candidate">K Candidates</label>
               <input id="k_candidate" type="number" step="1" bind:value={customParams.k_candidates} />
             </div>
             <div class="field">
-              <label for="time_multp">Süre Çarpanı</label>
+              <label for="time_multp">Time Multiplier</label>
               <input id="time_multp" type="number" step="0.1" bind:value={customParams.time_multiplier} />
             </div>
             <div class="field">
-              <label for="max_k_lenght">Max K Uzunluk</label>
+              <label for="max_k_lenght">Max K length</label>
               <input id="max_k_lenght" type="number" step="1" bind:value={customParams.max_k} />
             </div>
           </div>
@@ -135,10 +179,61 @@
     </div>
   </div>
 {/if}
+
 <style>
   .card {
     position: relative; 
     padding-top: 40px; 
+    margin-bottom: 20px; 
+  }
+
+  .expert-card {
+    padding: 20px;
+  }
+
+  .expert-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  .full-width {
+    flex: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .ngram-grid {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .ngram-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 5px 10px;
+    border-radius: 6px;
+    flex: 1;
+  }
+
+  .checkbox-line {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    text-transform: capitalize;
+    font-size: 0.9rem;
+  }
+
+  .weight-input {
+    width: 60px;
+    padding: 2px 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
   }
 
   .top-right-toggle {
@@ -281,44 +376,55 @@
   }
 
   .expert-grid {
-  display: flex;
-  gap: 20px; 
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.expert-section {
-  flex: 1; 
-  background: rgba(0, 0, 0, 0.05); 
-  padding: 15px;
-  border-radius: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.input-row {
-  display: flex;
-  flex-direction: column; 
-  gap: 10px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.field label {
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-@media (max-width: 600px) {
-  .expert-grid {
-    flex-direction: column;
+    display: flex;
+    gap: 20px; 
+    justify-content: space-between;
+    align-items: flex-start;
   }
-}
 
-.mode-selector-container {
+  .expert-section {
+    flex: 1; 
+    background: rgba(0, 0, 0, 0.05); 
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .input-row {
+    display: flex;
+    flex-direction: column; 
+    gap: 10px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .field label {
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+
+  .section-tag {
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: #333;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  @media (max-width: 600px) {
+    .expert-grid {
+      flex-direction: column;
+    }
+    .ngram-grid {
+      flex-direction: column;
+    }
+  }
+
+  .mode-selector-container {
     display: flex;
     justify-content: center;
     margin: 20px 0;
@@ -362,14 +468,14 @@
     color: #1a1a1a;
   }
 
-.glider {
-  position: absolute;
-  height: 40px;
-  background-color: #e6eef9;
-  z-index: 1;
-  border-radius: 99px;
-  transition: all 0.25s ease-out;
-}
+  .glider {
+    position: absolute;
+    height: 40px;
+    background-color: #e6eef9;
+    z-index: 1;
+    border-radius: 99px;
+    transition: all 0.25s ease-out;
+  }
 
   .btn-decode.loading {
     color: #e8e8e8; 

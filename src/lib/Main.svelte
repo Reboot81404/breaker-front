@@ -13,16 +13,21 @@
   let loading = false;
   let speed = "medium";
   let isAdvanced = false;
+  let ngramWeights = {
+  bigram: 0,
+  trigram: 0,
+  quadgram: 1
+};
   let customParams = {};
 
 
-  async function decode(selectedSpeed, advancedMode, params,mode) {
+  async function decode(selectedSpeed, advancedMode, params,mode, ngramWeights) {
     loading = true;
     //logs = [];
 
     try {
-        const res = await fetch("/api/solve", {  
-        //const res = await fetch("http://127.0.0.1:8000/solve", {
+        //const res = await fetch("/api/solve", {  
+        const res = await fetch("http://127.0.0.1:8000/solve", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -32,7 +37,8 @@
           speed: selectedSpeed,
           is_advanced: advancedMode,
           custom_params: params,
-          mode: mode
+          mode: mode,
+          ngrams: ngramWeights
          })
       });
 
@@ -58,6 +64,7 @@
   bind:speed 
   bind:isAdvanced 
   bind:customParams 
+  bind:ngramWeights
   onDecode={decode} 
   {loading} 
 />
